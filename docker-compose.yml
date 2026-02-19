@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: promptfy-db
+    environment:
+      POSTGRES_USER: promptfy
+      POSTGRES_PASSWORD: promptfy
+      POSTGRES_DB: promptfy
+    ports:
+      - "5432:5432"
+    volumes:
+      - promptfy-db:/var/lib/postgresql/data
+
+volumes:
+  promptfy-db:
