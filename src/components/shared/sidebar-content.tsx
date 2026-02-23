@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { ChevronRightIcon, PlusIcon } from 'lucide-react';
+import { ChevronLeftIcon, PlusIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -40,7 +40,7 @@ export const SidebarContent = () => {
             className='absolute top-0 -right-10 cursor-pointer'
             onClick={() => setIsClosed(!isClosed)}
           >
-            <ChevronRightIcon
+            <ChevronLeftIcon
               className={cn('transition-transform duration-600 ease-in-out', {
                 'rotate-180': isClosed,
                 'rotate-0': !isClosed,
