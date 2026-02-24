@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
+import { Input } from '../ui/input';
 import { Logo } from './logo';
 
 export type SidebarContentProps = {
@@ -57,6 +58,13 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
         </div>
 
         {/* Content */}
+        <Input
+          type='search'
+          id='search'
+          name='search'
+          placeholder='Search...'
+        />
+
         <Button
           title='Add new prompt'
           aria-label='Add new prompt'

@@ -45,6 +45,16 @@ const makeSut = (
 ) => render(<SidebarContent prompts={prompts} />);
 
 describe('SidebarContent', () => {
+  it('should update search input on type', () => {
+    makeSut();
+    const text = 'test';
+    const searchInput = screen.getByRole('searchbox');
+
+    fireEvent.change(searchInput, { target: { value: text } });
+
+    expect(searchInput).toHaveValue(text);
+  });
+
   it('should renders new prompt button', () => {
     makeSut();
 
@@ -64,7 +74,6 @@ describe('SidebarContent', () => {
 
   it('should open and close sidebar', () => {
     makeSut();
-
     const sidebar = screen.getByLabelText('sidebar');
     const button = screen.getByRole('button', { name: /open and close menu/i });
 
@@ -81,7 +90,6 @@ describe('SidebarContent', () => {
 
   it('should navidate to new prompt page', () => {
     makeSut();
-
     const button = screen.getByRole('button', { name: /new prompt/i });
 
     fireEvent.click(button);
