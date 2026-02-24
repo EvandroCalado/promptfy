@@ -45,55 +45,85 @@ const makeSut = (
 ) => render(<SidebarContent prompts={prompts} />);
 
 describe('SidebarContent', () => {
-  it('should update search input on type', () => {
-    makeSut();
-    const text = 'test';
-    const searchInput = screen.getByRole('searchbox');
+  describe('Base', () => {
+    it('should update search input on type', () => {
+      makeSut();
+      const text = 'test';
+      const searchInput = screen.getByRole('searchbox');
 
-    fireEvent.change(searchInput, { target: { value: text } });
+      fireEvent.change(searchInput, { target: { value: text } });
 
-    expect(searchInput).toHaveValue(text);
+      expect(searchInput).toHaveValue(text);
+    });
+
+    it('should renders new prompt button', () => {
+      makeSut();
+
+      expect(
+        screen.getByRole('button', { name: /new prompt/i }),
+      ).toBeInTheDocument();
+    });
+
+    it('should render prompts list', () => {
+      makeSut();
+
+      expect(screen.getByText(initialPrompts[0].title)).toBeInTheDocument();
+      expect(screen.getByText(initialPrompts[1].title)).toBeInTheDocument();
+      expect(screen.getByText(initialPrompts[2].title)).toBeInTheDocument();
+      expect(screen.getAllByRole('paragraph').length).toBe(
+        initialPrompts.length,
+      );
+    });
   });
 
-  it('should renders new prompt button', () => {
-    makeSut();
+  describe('Sidebar', () => {
+    it('should open and close sidebar', () => {
+      makeSut();
+      const sidebar = screen.getByLabelText('sidebar');
+      const button = screen.getByRole('button', {
+        name: /open and close menu/i,
+      });
 
-    expect(
-      screen.getByRole('button', { name: /new prompt/i }),
-    ).toBeInTheDocument();
+      expect(sidebar).toHaveClass('md:w-[20vw]');
+      expect(screen.getByText('New prompt')).not.toHaveClass('opacity-0');
+      expect(screen.getByText('New prompt')).toHaveClass('opacity-100');
+
+      fireEvent.click(button);
+
+      expect(sidebar).toHaveClass('md:w-22');
+      expect(screen.getByText('New prompt')).toHaveClass('opacity-0');
+      expect(screen.getByText('New prompt')).not.toHaveClass('opacity-100');
+    });
   });
 
-  it('should render prompts list', () => {
-    makeSut();
+  describe('New prompt', () => {
+    it('should navidate to new prompt page', () => {
+      makeSut();
+      const button = screen.getByRole('button', { name: /new prompt/i });
 
-    expect(screen.getByText(initialPrompts[0].title)).toBeInTheDocument();
-    expect(screen.getByText(initialPrompts[1].title)).toBeInTheDocument();
-    expect(screen.getByText(initialPrompts[2].title)).toBeInTheDocument();
-    expect(screen.getAllByRole('paragraph').length).toBe(initialPrompts.length);
+      fireEvent.click(button);
+
+      expect(pushMock).toHaveBeenCalledWith('/new');
+    });
   });
 
-  it('should open and close sidebar', () => {
-    makeSut();
-    const sidebar = screen.getByLabelText('sidebar');
-    const button = screen.getByRole('button', { name: /open and close menu/i });
+  describe('Search', () => {
+    it('should update url on type search and clean', () => {
+      makeSut();
+      const text = 'a b';
+      const searchInput = screen.getByRole('searchbox');
 
-    expect(sidebar).toHaveClass('md:w-[20vw]');
-    expect(screen.getByText('New prompt')).not.toHaveClass('opacity-0');
-    expect(screen.getByText('New prompt')).toHaveClass('opacity-100');
+      fireEvent.change(searchInput, { target: { value: text } });
 
-    fireEvent.click(button);
+      expect(pushMock).toHaveBeenCalled();
+      const lastCall = pushMock.mock.calls.at(-1);
+      expect(lastCall?.[0]).toBe('/?q=a%20b');
 
-    expect(sidebar).toHaveClass('md:w-22');
-    expect(screen.getByText('New prompt')).toHaveClass('opacity-0');
-    expect(screen.getByText('New prompt')).not.toHaveClass('opacity-100');
-  });
+      fireEvent.change(searchInput, { target: { value: '' } });
 
-  it('should navidate to new prompt page', () => {
-    makeSut();
-    const button = screen.getByRole('button', { name: /new prompt/i });
-
-    fireEvent.click(button);
-
-    expect(pushMock).toHaveBeenCalledWith('/new');
+      expect(pushMock).toHaveBeenCalled();
+      const lastCall2 = pushMock.mock.calls.at(-1);
+      expect(lastCall2?.[0]).toBe('/');
+    });
   });
 });

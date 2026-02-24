@@ -19,10 +19,19 @@ export type SidebarContentProps = {
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const [isClosed, setIsClosed] = useState(false);
+  const [query, setQuery] = useState('');
 
   const router = useRouter();
 
   const handleNewPrompt = () => router.push('/new');
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    const url = newQuery ? `/?q=${encodeURIComponent(newQuery)}` : '/';
+
+    setQuery(newQuery);
+    router.push(url, { scroll: false });
+  };
 
   return (
     <Card
@@ -63,6 +72,8 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
           id='search'
           name='search'
           placeholder='Search...'
+          value={query}
+          onChange={handleQueryChange}
         />
 
         <Button
