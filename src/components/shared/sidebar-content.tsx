@@ -5,13 +5,18 @@ import { useState } from 'react';
 
 import { ChevronLeftIcon, PlusIcon } from 'lucide-react';
 
+import { Prompt } from '@/generated/prisma/client';
 import { cn } from '@/lib/utils';
 
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Logo } from './logo';
 
-export const SidebarContent = () => {
+export type SidebarContentProps = {
+  prompts: Prompt[];
+};
+
+export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const [isClosed, setIsClosed] = useState(false);
 
   const router = useRouter();
@@ -77,6 +82,10 @@ export const SidebarContent = () => {
             New prompt
           </span>
         </Button>
+
+        {prompts.map(prompt => (
+          <p key={prompt.id}>{prompt.title}</p>
+        ))}
       </CardContent>
     </Card>
   );
