@@ -20,6 +20,8 @@ export const SidebarContent = () => {
 
   return (
     <Card
+      title='sidebar'
+      aria-label='sidebar'
       className={cn(
         'transition-[transform, width] fixed top-0 left-0 z-50 flex h-full w-[80vw] flex-col rounded-none border-r duration-300 ease-in-out md:relative md:z-auto md:w-[20vw]',
         {
@@ -35,8 +37,8 @@ export const SidebarContent = () => {
           <Button
             size={'icon-sm'}
             variant={'secondary'}
-            aria-label='open and close menu'
             title='open and close menu'
+            aria-label='open and close menu'
             className='absolute top-0 -right-10 cursor-pointer'
             onClick={() => setIsClosed(!isClosed)}
           >
@@ -51,8 +53,8 @@ export const SidebarContent = () => {
 
         {/* Content */}
         <Button
-          aria-label='Add new prompt'
           title='Add new prompt'
+          aria-label='Add new prompt'
           className={cn(
             'transition-[width, gap] cursor-pointer duration-150 ease-in-out',
             {
