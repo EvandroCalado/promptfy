@@ -6,11 +6,13 @@ import { Prompt } from '@/generated/prisma/client';
 import { fireEvent, render, screen } from '@/lib/test-utils';
 
 const pushMock = jest.fn();
+let searchParamsMock = new URLSearchParams();
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: pushMock,
   }),
+  useSearchParams: () => searchParamsMock,
 }));
 
 const initialPrompts: Prompt[] = [
@@ -124,6 +126,16 @@ describe('SidebarContent', () => {
       expect(pushMock).toHaveBeenCalled();
       const lastCall2 = pushMock.mock.calls.at(-1);
       expect(lastCall2?.[0]).toBe('/');
+    });
+
+    it('should start search input with url query', () => {
+      const text = 'initial';
+      const searchParams = new URLSearchParams(`?q=${text}`);
+      searchParamsMock = searchParams;
+      makeSut();
+      const searchInput = screen.getByRole('searchbox');
+
+      expect(searchInput).toHaveValue(text);
     });
   });
 });

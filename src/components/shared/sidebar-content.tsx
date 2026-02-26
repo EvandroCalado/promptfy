@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { ChevronLeftIcon, PlusIcon } from 'lucide-react';
@@ -18,10 +18,11 @@ export type SidebarContentProps = {
 };
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
-  const [isClosed, setIsClosed] = useState(false);
-  const [query, setQuery] = useState('');
-
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [isClosed, setIsClosed] = useState(false);
+  const [query, setQuery] = useState(searchParams.get('q') || '');
 
   const handleNewPrompt = () => router.push('/new');
 
@@ -74,6 +75,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
           placeholder='Search...'
           value={query}
           onChange={handleQueryChange}
+          autoFocus
         />
 
         <Button
