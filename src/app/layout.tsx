@@ -22,7 +22,9 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang='pt-BR' data-yd-content-ready='true'>
-      <body className={`${inter.className} flex min-h-screen antialiased`}>
+      <body
+        className={`${inter.className} flex min-h-screen overflow-hidden antialiased`}
+      >
         <Sidebar />
         <main className='flex-1'>{children}</main>
       </body>

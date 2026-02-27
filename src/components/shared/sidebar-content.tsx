@@ -5,16 +5,18 @@ import { useState } from 'react';
 
 import { ChevronLeftIcon, PlusIcon } from 'lucide-react';
 
-import { Prompt } from '@/generated/prisma/client';
+import { PromptEntity } from '@/core/domain/prompts/prompt.entity';
 import { cn } from '@/lib/utils';
 
+import { PromptList } from '../prompts/prompt-list';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Input } from '../ui/input';
+import { ScrollArea } from '../ui/scroll-area';
 import { Logo } from './logo';
 
 export type SidebarContentProps = {
-  prompts: Prompt[];
+  prompts: PromptEntity[];
 };
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
@@ -39,14 +41,14 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
       title='sidebar'
       aria-label='sidebar'
       className={cn(
-        'transition-[transform, width] fixed top-0 left-0 z-50 flex h-full w-[80vw] flex-col rounded-none border-r duration-300 ease-in-out md:relative md:z-auto md:w-[20vw]',
+        'transition-[transform, width] fh-full fixed top-0 left-0 z-5 w-[80vw] rounded-none border-r duration-300 ease-in-out md:relative md:z-auto md:w-[20vw]',
         {
           'md:w-22': isClosed,
         },
       )}
     >
-      <CardContent className='space-y-4'>
-        <div className='relative mx-auto h-8'>
+      <CardContent className='relative space-y-4'>
+        <div>
           <Logo isClosed={isClosed} />
 
           {/* Close button */}
@@ -55,7 +57,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
             variant={'secondary'}
             title='open and close menu'
             aria-label='open and close menu'
-            className='absolute top-0 -right-10 cursor-pointer'
+            className='absolute top-0 -right-5 cursor-pointer'
             onClick={() => setIsClosed(!isClosed)}
           >
             <ChevronLeftIcon
@@ -104,9 +106,20 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
           </span>
         </Button>
 
-        {prompts.map(prompt => (
-          <p key={prompt.id}>{prompt.title}</p>
-        ))}
+        <ScrollArea
+          className={cn(
+            'transition-[width, opacity] h-[calc(100vh-12rem)] w-full pr-3 duration-150 ease-in-out',
+            {
+              'pointer-events-none w-0 opacity-0': isClosed,
+              'w-full opacity-100': !isClosed,
+            },
+          )}
+          role='navigation'
+          aria-label='prompt-list'
+          title='prompt-list'
+        >
+          <PromptList prompts={prompts} />
+        </ScrollArea>
       </CardContent>
     </Card>
   );

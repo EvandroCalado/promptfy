@@ -96,6 +96,27 @@ describe('SidebarContent', () => {
       expect(screen.getByText('New prompt')).toHaveClass('opacity-0');
       expect(screen.getByText('New prompt')).not.toHaveClass('opacity-100');
     });
+
+    it('should not render prompts list when sidebar is closed', () => {
+      makeSut();
+      const button = screen.getByRole('button', {
+        name: /open and close menu/i,
+      });
+      const promptList = screen.getByRole('navigation');
+
+      fireEvent.click(button);
+
+      expect(promptList).toHaveClass('opacity-0 w-0');
+      expect(promptList).not.toHaveClass('opacity-100 w-full');
+    });
+
+    it('should render prompts list when sidebar is open', () => {
+      makeSut();
+      const promptList = screen.getByRole('navigation');
+
+      expect(promptList).toHaveClass('opacity-100 w-full');
+      expect(promptList).not.toHaveClass('opacity-0 w-0');
+    });
   });
 
   describe('New prompt', () => {
