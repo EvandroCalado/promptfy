@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 
 import { ChevronLeftIcon, PlusIcon } from 'lucide-react';
 
+import { searchPromptsAction } from '@/actions/prompt.actions';
 import { PromptEntity } from '@/core/domain/prompts/prompt.entity';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +14,7 @@ import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Input } from '../ui/input';
 import { ScrollArea } from '../ui/scroll-area';
+import { Spinner } from '../ui/spinner';
 import { Logo } from './logo';
 
 export type SidebarContentProps = {
@@ -23,17 +25,31 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [searchState, searchAction, isPending] = useActionState(
+    searchPromptsAction,
+    {
+      success: true,
+      prompts,
+    },
+  );
+
   const [isClosed, setIsClosed] = useState(false);
   const [query, setQuery] = useState(searchParams.get('q') || '');
+
+  const hasQuery = query.trim().length > 0;
+  const promptsLint = hasQuery ? (searchState.prompts ?? prompts) : prompts;
 
   const handleNewPrompt = () => router.push('/new');
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value;
-    const url = newQuery ? `/?q=${encodeURIComponent(newQuery)}` : '/';
-
     setQuery(newQuery);
+
+    const url = newQuery ? `/?q=${encodeURIComponent(newQuery)}` : '/';
     router.push(url, { scroll: false });
+    formRef.current?.requestSubmit();
   };
 
   return (
@@ -70,15 +86,26 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
         </div>
 
         {/* Content */}
-        <Input
-          type='search'
-          id='search'
-          name='search'
-          placeholder='Search...'
-          value={query}
-          onChange={handleQueryChange}
-          autoFocus
-        />
+        <form
+          ref={formRef}
+          action={searchAction}
+          className='group relative w-full'
+        >
+          <Input
+            name='q'
+            placeholder='Search...'
+            value={query}
+            onChange={handleQueryChange}
+            autoFocus
+          />
+
+          {isPending && (
+            <Spinner
+              className='absolute top-1/2 right-2 -translate-y-1/2'
+              aria-label='loading'
+            />
+          )}
+        </form>
 
         <Button
           title='Add new prompt'
@@ -118,7 +145,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
           aria-label='prompt-list'
           title='prompt-list'
         >
-          <PromptList prompts={prompts} />
+          <PromptList prompts={promptsLint} />
         </ScrollArea>
       </CardContent>
     </Card>

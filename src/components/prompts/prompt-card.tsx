@@ -2,12 +2,12 @@ import Link from 'next/link';
 
 import { Trash2Icon } from 'lucide-react';
 
-import { PromptEntity } from '@/core/domain/prompts/prompt.entity';
+import { PromptSumary } from '@/core/domain/prompts/prompt.entity';
 
 import { Button } from '../ui/button';
 
 type PromptCardProps = {
-  prompt: PromptEntity;
+  prompt: PromptSumary;
 };
 
 export const PromptCard = ({ prompt }: PromptCardProps) => {

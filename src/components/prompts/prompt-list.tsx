@@ -1,9 +1,9 @@
-import { PromptEntity } from '@/core/domain/prompts/prompt.entity';
+import { PromptSumary } from '@/core/domain/prompts/prompt.entity';
 
 import { PromptCard } from './prompt-card';
 
 type PromptListProps = {
-  prompts: PromptEntity[];
+  prompts: PromptSumary[];
 };
 
 export const PromptList = ({ prompts }: PromptListProps) => {
