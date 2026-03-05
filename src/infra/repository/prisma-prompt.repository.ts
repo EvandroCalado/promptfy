@@ -1,0 +1,33 @@
+import { PromptEntity } from '@/core/domain/prompts/prompt.entity';
+import { PromptRepository } from '@/core/domain/prompts/prompt.repository';
+import { PrismaClient } from '@/generated/prisma/client';
+
+export class PrismaPromptRepository implements PromptRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async findMany(): Promise<PromptEntity[]> {
+    const prompts = await this.prisma.prompt.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return prompts;
+  }
+
+  async searchMany(term?: string): Promise<PromptEntity[]> {
+    const query = term?.trim();
+
+    const prompts = await this.prisma.prompt.findMany({
+      where: query
+        ? {
+            OR: [
+              { title: { contains: query, mode: 'insensitive' } },
+              { content: { contains: query, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return prompts;
+  }
+}
