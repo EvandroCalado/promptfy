@@ -93,6 +93,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
         >
           <Input
             name='q'
+            type='search'
             placeholder='Search...'
             value={query}
             onChange={handleQueryChange}

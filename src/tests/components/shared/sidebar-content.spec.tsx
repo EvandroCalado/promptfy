@@ -1,3 +1,5 @@
+import { useActionState } from 'react';
+
 import {
   SidebarContent,
   SidebarContentProps,
@@ -13,6 +15,15 @@ jest.mock('next/navigation', () => ({
     push: pushMock,
   }),
   useSearchParams: () => searchParamsMock,
+}));
+
+jest.mock('@/actions/prompt.actions', () => ({
+  searchPromptsAction: jest.fn(),
+}));
+
+jest.mock('react', () => ({
+  ...jest.requireActual('react'),
+  useActionState: jest.fn(),
 }));
 
 const initialPrompts: Prompt[] = [
@@ -44,7 +55,14 @@ const initialPrompts: Prompt[] = [
 
 const makeSut = (
   { prompts = initialPrompts }: SidebarContentProps = {} as SidebarContentProps,
-) => render(<SidebarContent prompts={prompts} />);
+) => {
+  (useActionState as jest.Mock).mockReturnValue([
+    { success: true, prompts },
+    jest.fn(),
+    false,
+  ]);
+  return render(<SidebarContent prompts={prompts} />);
+};
 
 describe('SidebarContent', () => {
   describe('Base', () => {
