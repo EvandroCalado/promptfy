@@ -15,7 +15,7 @@ export const searchPromptsAction = async (
   _prevState: SearchFormState,
   formData: FormData,
 ): Promise<SearchFormState> => {
-  const term = formData.get('q')?.toString();
+  const term = String(formData.get('q') ?? '').trim();
   const repository = new PrismaPromptRepository(prisma);
   const useCase = new SearchPromptsUseCase(repository);
 
@@ -33,9 +33,7 @@ export const searchPromptsAction = async (
       success: true,
       prompts: summaries,
     };
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     return {
       success: false,
       message: 'Failed to fetch prompts',
