@@ -6,7 +6,7 @@ import { useActionState, useRef, useState } from 'react';
 import { ChevronLeftIcon, PlusIcon } from 'lucide-react';
 
 import { searchPromptsAction } from '@/actions/prompt.actions';
-import { Prompt } from '@/core/domain/prompts/prompt.entity';
+import { PromptEntity } from '@/core/domain/prompts/prompt.entity';
 import { cn } from '@/lib/utils';
 
 import { PromptList } from '../prompts/prompt-list';
@@ -18,7 +18,7 @@ import { Spinner } from '../ui/spinner';
 import { Logo } from './logo';
 
 export type SidebarContentProps = {
-  prompts: Prompt[];
+  prompts: PromptEntity[];
 };
 
 export const SidebarContent = ({ prompts }: SidebarContentProps) => {
