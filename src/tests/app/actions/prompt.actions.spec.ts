@@ -4,17 +4,6 @@ const mockedSearchExecute = jest.fn();
 
 jest.mock('@/lib/prisma', () => ({ prisma: {} }));
 
-// jest.mock('@/core/domain/prompts/prompt.repository', () => {
-//   return {
-//     PromptRepository: jest.fn().mockImplementation(() => {
-//       return {
-//         findMany: jest.fn(),
-//         searchMany: mockedSearchExecute,
-//       };
-//     }),
-//   };
-// });
-
 jest.mock('@/core/application/prompts/search-prompts.use-case', () => ({
   SearchPromptsUseCase: jest.fn().mockImplementation(() => ({
     execute: mockedSearchExecute,
