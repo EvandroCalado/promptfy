@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 
 import { ChevronLeftIcon, PlusIcon } from 'lucide-react';
 
@@ -39,7 +39,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
   const [query, setQuery] = useState(searchParams.get('q') || '');
 
   const hasQuery = query.trim().length > 0;
-  const promptsLint = hasQuery ? (searchState.prompts ?? prompts) : prompts;
+  const promptsList = hasQuery ? (searchState.prompts ?? prompts) : prompts;
 
   const handleNewPrompt = () => router.push('/new');
 
@@ -51,6 +51,12 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
     router.push(url, { scroll: false });
     formRef.current?.requestSubmit();
   };
+
+  useEffect(() => {
+    if (!hasQuery) return;
+
+    formRef.current?.requestSubmit();
+  }, [hasQuery]);
 
   return (
     <Card
@@ -146,7 +152,7 @@ export const SidebarContent = ({ prompts }: SidebarContentProps) => {
           aria-label='prompt-list'
           title='prompt-list'
         >
-          <PromptList prompts={promptsLint} />
+          <PromptList prompts={promptsList} />
         </ScrollArea>
       </CardContent>
     </Card>

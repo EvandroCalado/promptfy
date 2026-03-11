@@ -1,9 +1,6 @@
 import { useActionState } from 'react';
 
-import {
-  SidebarContent,
-  SidebarContentProps,
-} from '@/components/shared/sidebar-content';
+import { SidebarContent } from '@/components/shared/sidebar-content';
 import { Prompt } from '@/generated/prisma/client';
 import { fireEvent, render, screen } from '@/lib/test-utils';
 
@@ -53,14 +50,19 @@ const initialPrompts: Prompt[] = [
   },
 ];
 
+type MakeSutOptions = {
+  prompts?: Prompt[];
+  searchState?: { success: boolean; prompts?: Prompt[] };
+};
+
 const makeSut = (
-  { prompts = initialPrompts }: SidebarContentProps = {} as SidebarContentProps,
+  {
+    prompts = initialPrompts,
+    searchState,
+  }: MakeSutOptions = {} as MakeSutOptions,
 ) => {
-  (useActionState as jest.Mock).mockReturnValue([
-    { success: true, prompts },
-    jest.fn(),
-    false,
-  ]);
+  const state = searchState ?? { success: true, prompts };
+  (useActionState as jest.Mock).mockReturnValue([state, jest.fn(), false]);
   return render(<SidebarContent prompts={prompts} />);
 };
 
@@ -138,7 +140,7 @@ describe('SidebarContent', () => {
   });
 
   describe('New prompt', () => {
-    it('should navidate to new prompt page', () => {
+    it('should navigate to new prompt page', () => {
       makeSut();
       const button = screen.getByRole('button', { name: /new prompt/i });
 
@@ -175,6 +177,67 @@ describe('SidebarContent', () => {
       const searchInput = screen.getByRole('searchbox');
 
       expect(searchInput).toHaveValue(text);
+    });
+
+    it('should submit form on search input change', () => {
+      const submitSpy = jest
+        .spyOn(HTMLFormElement.prototype, 'requestSubmit')
+        .mockImplementation(() => undefined);
+      makeSut();
+      const text = 'test';
+      const searchInput = screen.getByRole('searchbox');
+
+      fireEvent.change(searchInput, { target: { value: text } });
+
+      expect(submitSpy).toHaveBeenCalled();
+      submitSpy.mockRestore();
+    });
+
+    it('should render search input with query from url', () => {
+      const submitSpy = jest
+        .spyOn(HTMLFormElement.prototype, 'requestSubmit')
+        .mockImplementation(() => undefined);
+      const text = 'test';
+      const searchParams = new URLSearchParams(`?q=${text}`);
+      searchParamsMock = searchParams;
+      makeSut();
+
+      expect(submitSpy).toHaveBeenCalled();
+      submitSpy.mockRestore();
+    });
+
+    it('should render prompts from search state when query exists', () => {
+      const searchResults: Prompt[] = [
+        {
+          ...initialPrompts[0],
+          id: 'search-1',
+          title: 'Search Prompt',
+        },
+      ];
+      const params = new URLSearchParams('?q=foo');
+      searchParamsMock = params;
+
+      makeSut({
+        prompts: initialPrompts,
+        searchState: { success: true, prompts: searchResults },
+      });
+
+      expect(screen.getByText(searchResults[0].title)).toBeInTheDocument();
+      expect(
+        screen.queryByText(initialPrompts[1].title),
+      ).not.toBeInTheDocument();
+    });
+
+    it('should fallback to initial prompts when searchState.prompts is undefined', () => {
+      const params = new URLSearchParams('?q=foo');
+      searchParamsMock = params;
+
+      makeSut({
+        prompts: initialPrompts,
+        searchState: { success: true, prompts: undefined },
+      });
+
+      expect(screen.getByText(initialPrompts[0].title)).toBeInTheDocument();
     });
   });
 });
