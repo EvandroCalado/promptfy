@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useActionState, useEffect } from 'react';
 
+import { toast } from 'sonner';
+
 import { createPromptAction } from '@/actions/prompt.actions';
 
 import { Button } from '../ui/button';
@@ -19,6 +21,11 @@ export const PromptForm = () => {
   useEffect(() => {
     if (state?.success) {
       router.refresh();
+      toast.success('Prompt saved successfully!');
+    }
+
+    if (!state.success) {
+      toast.error(state.message || 'Failed to save prompt');
     }
   }, [state, router]);
 
@@ -69,12 +76,6 @@ export const PromptForm = () => {
           </span>
         )}
       </div>
-
-      {!state?.success && state?.message && (
-        <div className='w-full rounded bg-red-50 p-2'>
-          <p className='text-xs font-semibold text-red-500'>{state.message}</p>
-        </div>
-      )}
     </form>
   );
 };

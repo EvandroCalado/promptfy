@@ -7,6 +7,12 @@ export class PrismaPromptRepository implements PromptRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async create(data: CreatePromptDto): Promise<void> {
+    const existingPrompt = await this.findByTitle(data.title);
+
+    if (existingPrompt) {
+      throw new Error('Prompt with this title already exists');
+    }
+
     await this.prisma.prompt.create({
       data: {
         title: data.title,

@@ -1,8 +1,18 @@
-import { PromptEntity } from '@/core/domain/prompts/prompt.entity';
+import { CreatePromptDto } from '@/core/application/prompts/create-prompt.dto';
+import {
+  PromptEntity,
+  PromptSumary,
+} from '@/core/domain/prompts/prompt.entity';
 import { PrismaClient } from '@/generated/prisma/client';
 import { PrismaPromptRepository } from '@/infra/repository/prisma-prompt.repository';
 
 type PromptDelegateMock = {
+  create: jest.MockedFunction<
+    (args: { data: CreatePromptDto }) => Promise<void>
+  >;
+  findFirst: jest.MockedFunction<
+    (args: { where: { title: string } }) => Promise<PromptSumary | null>
+  >;
   findMany: jest.MockedFunction<
     (args: {
       orderBy?: {
@@ -25,6 +35,8 @@ type PrismaMock = {
 const createMockPrisma = () => {
   const mock: PrismaMock = {
     prompt: {
+      create: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
     },
   };
@@ -39,6 +51,70 @@ describe('PrismaPromptRepository', () => {
   beforeEach(() => {
     prisma = createMockPrisma();
     repository = new PrismaPromptRepository(prisma);
+  });
+
+  describe('create', () => {
+    it('should create a new prompt', async () => {
+      const input: CreatePromptDto = {
+        title: 'Test Prompt',
+        description: 'Test Description',
+        content: 'Test Content',
+      };
+
+      await repository.create(input);
+
+      expect(prisma.prompt.create).toHaveBeenCalledWith({
+        data: input,
+      });
+    });
+
+    it('should throw an error if title already exists', async () => {
+      const input: CreatePromptDto = {
+        title: 'Existing Prompt',
+        description: 'Test Description',
+        content: 'Test Content',
+      };
+      prisma.prompt.findFirst.mockResolvedValue({
+        id: '1',
+        title: input.title,
+        description: input.description,
+        content: input.content,
+      });
+
+      await expect(repository.create(input)).rejects.toThrow(
+        'Prompt with this title already exists',
+      );
+    });
+  });
+
+  describe('findByTitle', () => {
+    it('should find a prompt by title', async () => {
+      const input: PromptSumary = {
+        id: '1',
+        title: 'Test Prompt',
+        description: 'Test Description',
+        content: 'Test Content',
+      };
+      prisma.prompt.findFirst.mockResolvedValue(input);
+
+      const result = await repository.findByTitle(input.title);
+
+      expect(prisma.prompt.findFirst).toHaveBeenCalledWith({
+        where: { title: input.title },
+      });
+      expect(result).toMatchObject(input);
+    });
+
+    it('should return null if prompt not found', async () => {
+      prisma.prompt.findFirst.mockResolvedValue(null);
+
+      const result = await repository.findByTitle('Nonexistent Prompt');
+
+      expect(prisma.prompt.findFirst).toHaveBeenCalledWith({
+        where: { title: 'Nonexistent Prompt' },
+      });
+      expect(result).toBeNull();
+    });
   });
 
   describe('findMany', () => {

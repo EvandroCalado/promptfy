@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 import { Sidebar } from '@/components/shared/sidebar';
+import { Toaster } from '@/components/ui/sonner';
 import '@/styles/globals.css';
 
 const inter = Inter({
@@ -27,6 +28,7 @@ const RootLayout = ({
       >
         <Sidebar />
         <main className='flex-1'>{children}</main>
+        <Toaster position='top-center' invert={true} richColors={true} />
       </body>
     </html>
   );
