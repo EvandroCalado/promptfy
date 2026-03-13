@@ -30,6 +30,8 @@ describe('SearchPromptsUseCase', () => {
           prompt.title.toLowerCase().includes(term.toLowerCase()) ||
           prompt.content.toLowerCase().includes(term.toLowerCase()),
       ),
+    findByTitle: async () => null,
+    create: async () => {},
   };
 
   it('should return all prompts when no search term is provided', async () => {
